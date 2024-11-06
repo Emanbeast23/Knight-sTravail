@@ -4,35 +4,50 @@ import math
 
 # Pygame setup
 pygame.init()
-screen = pygame.display.set_mode((600, 600))
+screen = pygame.display.set_mode((600, 700))
 clock = pygame.time.Clock()
 
 # Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+CHESSWHITE = (180, 146, 118)
+CHESSBLACK = (80, 47, 30)
+BLACK = (20, 20, 20)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 # Chessboard setup
 BOARD_SIZE = 8
 SQUARE_SIZE = 600 // BOARD_SIZE
-knight_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
-
-# Positions for testing
-start_pos = (0, 0)
-goal_pos = (7, 7)
+board_graphic = pygame.image.load('assets/chessboard.jpg')
+knight_graphic = pygame.image.load('assets/knight.png')
+font = pygame.font.Font('assets/RobotoMono.ttf', 20)
+user_text = ['Select a square to place the knight', 'Select another square to traverse to']
+user_input = 0
 
 # Function to draw the chessboard
 def draw_board():
     for row in range(BOARD_SIZE):
         for col in range(BOARD_SIZE):
-            color = WHITE if (row + col) % 2 == 0 else BLACK
+            color = CHESSWHITE if (row + col) % 2 == 0 else CHESSBLACK
             pygame.draw.rect(screen, color, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+    
+    screen.blit(font.render(user_text[user_input], True, 'white'), (85, 635))
+    correct_board_graphic = pygame.transform.scale(board_graphic, (600,600))
+    screen.blit(correct_board_graphic, (0,0))
+
+# Positions for testing
+knight_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
+start_pos = (0, 0)
+goal_pos = (7, 7)
+
 
 # Function to draw the knight
 def draw_knight(position, color):
     x, y = position
+    correct_knight_graphic = pygame.transform.scale(knight_graphic, (75, 75))
     pygame.draw.circle(screen, color, (x * SQUARE_SIZE + SQUARE_SIZE // 2, y * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 3)
+    if color == RED:
+        screen.blit(correct_knight_graphic, (x * SQUARE_SIZE + SQUARE_SIZE // 2 - 35, y * SQUARE_SIZE + SQUARE_SIZE // 2 - 40))
+
 
 # A* algorithm implementation
 def a_star(start, goal):
@@ -117,6 +132,7 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
+                user_input = 1
                 # Switch between A* and Dijkstra
                 use_a_star = not use_a_star
                 if use_a_star:
