@@ -20,7 +20,8 @@ SQUARE_SIZE = 600 // BOARD_SIZE
 board_graphic = pygame.image.load('assets/chessboard.jpg')
 knight_graphic = pygame.image.load('assets/knight.png')
 font = pygame.font.Font('assets/RobotoMono.ttf', 20)
-user_text = ['Select a square to place the knight', 'Select another square to traverse to']
+user_text = ['Select a square to place the knight', 'Select another square to traverse to', 
+             f'A* Implementation Cost: ', f'Dijkstra Implementation Cost: ', ' moves.']
 user_input = 0
 
 # Function to draw the chessboard
@@ -83,7 +84,7 @@ def a_star(start, goal):
         current = came_from.get(current, start)
     path.append(start)
     path.reverse()
-    return path
+    return path, len(path)
 
 # Dijkstra algorithm implementation
 def dijkstra(start, goal):
@@ -115,7 +116,7 @@ def dijkstra(start, goal):
         current = came_from.get(current, start)
     path.append(start)
     path.reverse()
-    return path
+    return path, len(path)
 
 # Main game loop
 running = True
@@ -136,9 +137,13 @@ while running:
                 # Switch between A* and Dijkstra
                 use_a_star = not use_a_star
                 if use_a_star:
-                    current_path = a_star(start_pos, goal_pos)
+                    user_input = 2
+                    current_path, cost = a_star(start_pos, goal_pos)
+                    screen.blit(font.render(user_text[user_input] + str(cost) + user_text[4], True, 'white'), (85, 635))
                 else:
-                    current_path = dijkstra(start_pos, goal_pos)
+                    user_input  = 3
+                    current_path, cost = dijkstra(start_pos, goal_pos)
+                    screen.blit(font.render(user_text[user_input] + str(cost) + user_text[4], True, 'white'), (85, 635))
 
     # Draw knight and path
     if current_path:
