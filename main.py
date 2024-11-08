@@ -39,8 +39,10 @@ def draw_board():
 
 # Positions for testing
 knight_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
-start_pos = (0, 0)
-goal_pos = (7, 7)
+# start_pos = (0, 0)
+# goal_pos = (7, 7)
+start_pos = None
+goal_pos = None
 
 
 # Function to draw the knight
@@ -135,16 +137,42 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                # Switch between A* and Dijkstra
-                use_a_star = not use_a_star
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # Getting the mouse position
+            mouse_x, mouse_y = event.pos
+            col = mouse_x // SQUARE_SIZE
+            row = mouse_y // SQUARE_SIZE
+
+            if start_pos is None:
+                start_pos = (col, row)
+            elif goal_pos is None:
+                goal_pos = (col, row)
+
                 if use_a_star:
                     current_path, cost = a_star(start_pos, goal_pos)
                     user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
                 else:
                     current_path, cost = dijkstra(start_pos, goal_pos)
                     user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                # Switch between A* and Dijkstra
+                use_a_star = not use_a_star
+                # Reset positions
+                if use_a_star:
+                    current_path, cost = a_star(start_pos, goal_pos)
+                    user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
+                else:
+                    current_path, cost = dijkstra(start_pos, goal_pos)
+                    user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
+        
+        # Tried: hitting "Return" clears the board and lets the player choose again?
+        # elif event.type == pygame.KEYDOWN:
+        #     if event.key == pygame.K_RETURN:
+        #         start_pos = None
+        #         goal_pos = None
+        #         current_path = []
 
     # Draw knight and path
     if current_path:
