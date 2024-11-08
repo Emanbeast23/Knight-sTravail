@@ -21,8 +21,7 @@ board_graphic = pygame.image.load('assets/chessboard.jpg')
 knight_graphic = pygame.image.load('assets/knight.png')
 font = pygame.font.Font('assets/RobotoMono.ttf', 20)
 user_text = ['Select a square to place the knight', 'Select another square to traverse to', 
-             f'A* Implementation Cost: ', f'Dijkstra Implementation Cost: ', ' moves.']
-user_input = 0
+             '', '']
 
 # Function to draw the chessboard
 def draw_board():
@@ -31,7 +30,10 @@ def draw_board():
             color = CHESSWHITE if (row + col) % 2 == 0 else CHESSBLACK
             pygame.draw.rect(screen, color, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
     
-    screen.blit(font.render(user_text[user_input], True, 'white'), (85, 635))
+    if current_path:
+        screen.blit(font.render(user_text[2] if use_a_star else user_text[3], True, 'white'), (85, 635))
+    else:
+        screen.blit(font.render(user_text[0], True, 'white'), (85, 635))
     correct_board_graphic = pygame.transform.scale(board_graphic, (600,600))
     screen.blit(correct_board_graphic, (0,0))
 
@@ -84,7 +86,8 @@ def a_star(start, goal):
         current = came_from.get(current, start)
     path.append(start)
     path.reverse()
-    return path, len(path)
+    cost = len(path) - 1
+    return path, cost
 
 # Dijkstra algorithm implementation
 def dijkstra(start, goal):
@@ -116,7 +119,8 @@ def dijkstra(start, goal):
         current = came_from.get(current, start)
     path.append(start)
     path.reverse()
-    return path, len(path)
+    cost = len(path) - 1
+    return path, cost
 
 # Main game loop
 running = True
@@ -133,17 +137,14 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                user_input = 1
                 # Switch between A* and Dijkstra
                 use_a_star = not use_a_star
                 if use_a_star:
-                    user_input = 2
                     current_path, cost = a_star(start_pos, goal_pos)
-                    screen.blit(font.render(user_text[user_input] + str(cost) + user_text[4], True, 'white'), (85, 635))
+                    user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
                 else:
-                    user_input  = 3
                     current_path, cost = dijkstra(start_pos, goal_pos)
-                    screen.blit(font.render(user_text[user_input] + str(cost) + user_text[4], True, 'white'), (85, 635))
+                    user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
 
     # Draw knight and path
     if current_path:
