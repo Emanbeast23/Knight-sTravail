@@ -137,7 +137,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN: # need to add UI transitions
             # Getting the mouse position
             mouse_x, mouse_y = event.pos
             col = mouse_x // SQUARE_SIZE
@@ -167,7 +167,7 @@ while running:
                     current_path, cost = dijkstra(start_pos, goal_pos)
                     user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
         
-        # Tried: hitting "Return" clears the board and lets the player choose again?
+        # Tried: hitting "Return" clears the board and lets the player choose again? Need ideas.
         # elif event.type == pygame.KEYDOWN:
         #     if event.key == pygame.K_RETURN:
         #         start_pos = None
