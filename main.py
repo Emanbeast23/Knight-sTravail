@@ -156,23 +156,30 @@ while running:
                     user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
 
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_LSHIFT:
+                # Reset positions
+                start_pos = None
+                goal_pos = None
+                current_path = []
+                user_text[0] = 'Select a square to place the knight'
+                user_text[2] = ''
+                user_text[3] = ''
+
+        #elif event.type == pygame.KEYDOWN:
+            elif event.key == pygame.K_SPACE:
                 # Switch between A* and Dijkstra
                 use_a_star = not use_a_star
                 # Reset positions
                 if use_a_star:
-                    current_path, cost = a_star(start_pos, goal_pos)
-                    user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
+                    if start_pos and goal_pos:
+                        current_path, cost = a_star(start_pos, goal_pos)
+                        user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
                 else:
-                    current_path, cost = dijkstra(start_pos, goal_pos)
-                    user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
+                    if start_pos and goal_pos:
+                        current_path, cost = dijkstra(start_pos, goal_pos)
+                        user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
         
-        # Tried: hitting "Return" clears the board and lets the player choose again? Need ideas.
-        # elif event.type == pygame.KEYDOWN:
-        #     if event.key == pygame.K_RETURN:
-        #         start_pos = None
-        #         goal_pos = None
-        #         current_path = []
+
 
     # Draw knight and path
     if current_path:
