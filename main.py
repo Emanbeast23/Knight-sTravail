@@ -20,8 +20,8 @@ SQUARE_SIZE = 600 // BOARD_SIZE
 board_graphic = pygame.image.load('assets/chessboard.jpg')
 knight_graphic = pygame.image.load('assets/knight.png')
 font = pygame.font.Font('assets/RobotoMono.ttf', 20)
-user_text = ['Select a square to place the knight', 'Select another square to traverse to']
-user_input = 0
+user_text = ['Select a square to place the knight', 'Select another square to traverse to', 
+             '', '']
 
 # Function to draw the chessboard
 def draw_board():
@@ -30,14 +30,19 @@ def draw_board():
             color = CHESSWHITE if (row + col) % 2 == 0 else CHESSBLACK
             pygame.draw.rect(screen, color, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
     
-    screen.blit(font.render(user_text[user_input], True, 'white'), (85, 635))
+    if current_path:
+        screen.blit(font.render(user_text[2] if use_a_star else user_text[3], True, 'white'), (85, 635))
+    else:
+        screen.blit(font.render(user_text[0], True, 'white'), (85, 635))
     correct_board_graphic = pygame.transform.scale(board_graphic, (600,600))
     screen.blit(correct_board_graphic, (0,0))
 
 # Positions for testing
 knight_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
-start_pos = (0, 0)
-goal_pos = (7, 7)
+# start_pos = (0, 0)
+# goal_pos = (7, 7)
+start_pos = None
+goal_pos = None
 
 
 # Function to draw the knight
@@ -83,7 +88,8 @@ def a_star(start, goal):
         current = came_from.get(current, start)
     path.append(start)
     path.reverse()
-    return path
+    cost = len(path) - 1
+    return path, cost
 
 # Dijkstra algorithm implementation
 def dijkstra(start, goal):
@@ -115,7 +121,8 @@ def dijkstra(start, goal):
         current = came_from.get(current, start)
     path.append(start)
     path.reverse()
-    return path
+    cost = len(path) - 1
+    return path, cost
 
 # Main game loop
 running = True
@@ -130,15 +137,49 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN: # need to add UI transitions
+            # Getting the mouse position
+            mouse_x, mouse_y = event.pos
+            col = mouse_x // SQUARE_SIZE
+            row = mouse_y // SQUARE_SIZE
+
+            if start_pos is None:
+                start_pos = (col, row)
+            elif goal_pos is None:
+                goal_pos = (col, row)
+
+                if use_a_star:
+                    current_path, cost = a_star(start_pos, goal_pos)
+                    user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
+                else:
+                    current_path, cost = dijkstra(start_pos, goal_pos)
+                    user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
+
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                user_input = 1
+            if event.key == pygame.K_LSHIFT:
+                # Reset positions
+                start_pos = None
+                goal_pos = None
+                current_path = []
+                user_text[0] = 'Select a square to place the knight'
+                user_text[2] = ''
+                user_text[3] = ''
+
+        #elif event.type == pygame.KEYDOWN:
+            elif event.key == pygame.K_SPACE:
                 # Switch between A* and Dijkstra
                 use_a_star = not use_a_star
+                # Reset positions
                 if use_a_star:
-                    current_path = a_star(start_pos, goal_pos)
+                    if start_pos and goal_pos:
+                        current_path, cost = a_star(start_pos, goal_pos)
+                        user_text[2] = f'A* Implementation Cost: {str(cost)} moves'
                 else:
-                    current_path = dijkstra(start_pos, goal_pos)
+                    if start_pos and goal_pos:
+                        current_path, cost = dijkstra(start_pos, goal_pos)
+                        user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
+        
+
 
     # Draw knight and path
     if current_path:
