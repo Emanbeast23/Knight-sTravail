@@ -11,7 +11,7 @@ clock = pygame.time.Clock()
 CHESSWHITE = (180, 146, 118)
 CHESSBLACK = (80, 47, 30)
 BLACK = (20, 20, 20)
-GREEN = (0, 255, 0)
+GRAY = (40, 40, 40, 128)
 RED = (255, 0, 0)
 HIGHLIGHT = (0, 0, 255)
 
@@ -21,7 +21,14 @@ SQUARE_SIZE = 600 // BOARD_SIZE
 
 # Load assets for graphics and fonts
 board_graphic = pygame.image.load('assets/chessboard.jpg')
+resized_board_graphic = pygame.transform.scale(board_graphic, (600,600))
+
 knight_graphic = pygame.image.load('assets/knight.png')
+resized_knight_graphic = pygame.transform.scale(knight_graphic, (75, 75))
+
+pawn_graphic = pygame.image.load('assets/pawn.png')
+resized_pawn_graphic = pygame.transform.scale(pawn_graphic, (65, 65))
+
 font = pygame.font.Font('assets/RobotoMono.ttf', 20)
 
 # Text displayed for instructions and results
@@ -44,7 +51,7 @@ def draw_board():
         text_to_show = user_text[2] if use_a_star else user_text[3]
         screen.blit(font.render(text_to_show, True, 'white'), (85, 635))
     else:
-        screen.blit(font.render(user_text[0], True, 'white'), (85, 635))
+        screen.blit(font.render(user_text[0] if start_pos is None else user_text[1], True, 'white'), (85, 635))
 
     # Draw the scaled chessboard graphic over the board
     scaled_board = pygame.transform.scale(board_graphic, (600, 600))
@@ -60,15 +67,21 @@ knight_moves = [
 start_pos = None
 goal_pos = None
 
-# Function to draw the knight at a specific position on the board
-def draw_knight(position, color):
-    x, y = position
-    scaled_knight = pygame.transform.scale(knight_graphic, (75, 75))
-    pygame.draw.circle(screen, color, (x * SQUARE_SIZE + SQUARE_SIZE // 2, y * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 3)
-    if color == RED:
-        screen.blit(scaled_knight, (x * SQUARE_SIZE + SQUARE_SIZE // 2 - 35, y * SQUARE_SIZE + SQUARE_SIZE // 2 - 40))
 
-# A* pathfinding algorithm to find the shortest path for the knight
+# Function to draw the knight
+def draw_knight(position, color, move = 0):
+    x, y = position
+
+    if position == start_pos or position == goal_pos:
+        pygame.draw.circle(screen, color, (x * SQUARE_SIZE + SQUARE_SIZE // 2, y * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 10)
+        screen.blit(font.render(str(move), True, 'white'), (x * SQUARE_SIZE + SQUARE_SIZE // 2 - 6, y * SQUARE_SIZE + SQUARE_SIZE // 2 - 15))
+        screen.blit(resized_knight_graphic, (x * SQUARE_SIZE + SQUARE_SIZE // 2 - 35, y * SQUARE_SIZE + SQUARE_SIZE // 2 - 40))
+    else:
+        pygame.draw.circle(screen, color, (x * SQUARE_SIZE + SQUARE_SIZE // 2, y * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 4)
+        screen.blit(font.render(str(move), True, 'white'), (x * SQUARE_SIZE + SQUARE_SIZE // 2 - 6, y * SQUARE_SIZE + SQUARE_SIZE // 2 - 15))
+
+
+# A* algorithm implementation
 def a_star(start, goal):
     def heuristic(a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
@@ -158,6 +171,7 @@ while running:
                 start_pos = (col, row)
             elif goal_pos is None:
                 goal_pos = (col, row)
+                
 
                 if use_a_star:
                     current_path, cost = a_star(start_pos, goal_pos)
@@ -194,8 +208,10 @@ while running:
 
     # Render the knight and the calculated path
     if current_path:
+        move = 0
         for pos in current_path:
-            draw_knight(pos, GREEN)
+            draw_knight(pos, GRAY, move)
+            move += 1
         draw_knight(start_pos, RED)
         draw_knight(goal_pos, RED)
 
