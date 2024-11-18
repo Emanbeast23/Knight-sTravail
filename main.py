@@ -13,7 +13,7 @@ CHESSBLACK = (80, 47, 30)
 BLACK = (20, 20, 20)
 GRAY = (40, 40, 40, 128)
 RED = (255, 0, 0)
-HIGHLIGHT = (0, 0, 255)
+HIGHLIGHT = (255, 255, 255)
 
 # Constants for chessboard setup
 BOARD_SIZE = 8
@@ -36,7 +36,8 @@ user_text = [
     'Select a square to place the knight',
     'Select another square to traverse to',
     '',  # A* result
-    ''   # Dijkstra result
+    '',   # Dijkstra result
+    'Press Left Shift to reset the board'
 ]
 
 # Function to render the chessboard and display user instructions
@@ -45,6 +46,10 @@ def draw_board():
         for col in range(BOARD_SIZE):
             color = CHESSWHITE if (row + col) % 2 == 0 else CHESSBLACK
             pygame.draw.rect(screen, color, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+    font = pygame.font.Font('assets/RobotoMono.ttf', 12)
+    screen.blit(font.render(user_text[4], True, 'white'), (5, 600)) # Left shift to reset board te
+    font = pygame.font.Font('assets/RobotoMono.ttf', 20)
     
     # Display appropriate instructions or results based on the game state
     if current_path:
@@ -163,7 +168,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            
             mouse_x, mouse_y = event.pos
+            if mouse_y > 600:
+                continue
             col = mouse_x // SQUARE_SIZE
             row = mouse_y // SQUARE_SIZE
 
@@ -201,10 +209,13 @@ while running:
                         user_text[3] = f'Dijkstra Implementation Cost: {cost} moves'
 
     # Highlight the square under the mouse
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    col = mouse_x // SQUARE_SIZE
-    row = mouse_y // SQUARE_SIZE
-    pygame.draw.rect(screen, HIGHLIGHT, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 5)
+    if start_pos is None or goal_pos is None:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if mouse_y > 600:
+            continue
+        col = mouse_x // SQUARE_SIZE
+        row = mouse_y // SQUARE_SIZE
+        pygame.draw.rect(screen, HIGHLIGHT, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 5)
 
     # Render the knight and the calculated path
     if current_path:
