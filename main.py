@@ -13,6 +13,7 @@ CHESSBLACK = (80, 47, 30)
 BLACK = (20, 20, 20)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+HIGHLIGHT = (0, 0, 255)  # Blue for highlighting a square
 
 # Chessboard setup
 BOARD_SIZE = 8
@@ -39,11 +40,8 @@ def draw_board():
 
 # Positions for testing
 knight_moves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
-# start_pos = (0, 0)
-# goal_pos = (7, 7)
 start_pos = None
 goal_pos = None
-
 
 # Function to draw the knight
 def draw_knight(position, color):
@@ -52,7 +50,6 @@ def draw_knight(position, color):
     pygame.draw.circle(screen, color, (x * SQUARE_SIZE + SQUARE_SIZE // 2, y * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 3)
     if color == RED:
         screen.blit(correct_knight_graphic, (x * SQUARE_SIZE + SQUARE_SIZE // 2 - 35, y * SQUARE_SIZE + SQUARE_SIZE // 2 - 40))
-
 
 # A* algorithm implementation
 def a_star(start, goal):
@@ -137,7 +134,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN: # need to add UI transitions
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             # Getting the mouse position
             mouse_x, mouse_y = event.pos
             col = mouse_x // SQUARE_SIZE
@@ -165,7 +162,6 @@ while running:
                 user_text[2] = ''
                 user_text[3] = ''
 
-        #elif event.type == pygame.KEYDOWN:
             elif event.key == pygame.K_SPACE:
                 # Switch between A* and Dijkstra
                 use_a_star = not use_a_star
@@ -178,8 +174,14 @@ while running:
                     if start_pos and goal_pos:
                         current_path, cost = dijkstra(start_pos, goal_pos)
                         user_text[3] = f'Dijkstra Implementation Cost: {str(cost)} moves'
-        
 
+    # Mouse hover to highlight square
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    col = mouse_x // SQUARE_SIZE
+    row = mouse_y // SQUARE_SIZE
+
+    # Draw the highlighted square
+    pygame.draw.rect(screen, HIGHLIGHT, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 5)
 
     # Draw knight and path
     if current_path:
