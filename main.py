@@ -6,6 +6,7 @@ import math
 pygame.init()
 screen = pygame.display.set_mode((600, 700))
 clock = pygame.time.Clock()
+pygame.display.set_caption("Knight's Travail")
 
 # Define colors used in the game
 CHESSWHITE = (180, 146, 118)
@@ -31,13 +32,15 @@ resized_pawn_graphic = pygame.transform.scale(pawn_graphic, (65, 65))
 
 font = pygame.font.Font('assets/RobotoMono.ttf', 20)
 
+pygame.display.set_icon(knight_graphic)
+
 # Text displayed for instructions and results
 user_text = [
     'Select a square to place the knight',
     'Select another square to traverse to',
     '',  # A* result
     '',   # Dijkstra result
-    'Press Left Shift to reset the board'
+    'Press Left Shift to reset board'
 ]
 
 # Function to render the chessboard and display user instructions
@@ -59,8 +62,7 @@ def draw_board():
         screen.blit(font.render(user_text[0] if start_pos is None else user_text[1], True, 'white'), (85, 635))
 
     # Draw the scaled chessboard graphic over the board
-    scaled_board = pygame.transform.scale(board_graphic, (600, 600))
-    screen.blit(scaled_board, (0, 0))
+    screen.blit(resized_board_graphic, (0, 0))
 
 # Predefined moves for a knight in chess
 knight_moves = [
@@ -216,10 +218,15 @@ while running:
         col = mouse_x // SQUARE_SIZE
         row = mouse_y // SQUARE_SIZE
         pygame.draw.rect(screen, HIGHLIGHT, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 5)
+    
+    if start_pos is not None:
+        start_col, start_row = start_pos
+        pygame.draw.rect(screen, HIGHLIGHT, (start_col * SQUARE_SIZE, start_row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 5)
 
     # Render the knight and the calculated path
     if current_path:
         move = 0
+        screen.blit(resized_board_graphic, (0, 0))
         for pos in current_path:
             draw_knight(pos, GRAY, move)
             move += 1
