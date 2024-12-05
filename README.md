@@ -79,11 +79,6 @@ This project is a visual simulation of a chess knight's pathfinding on an 8x8 ch
 
 ---
 
-## Screenshots
-*(Add screenshots of the program showing the knight's path and the chessboard here.)*
-
----
-
 ## Future Improvements
 - Add support for additional chess pieces.
 - Allow for dynamic board resizing.
